@@ -1,3 +1,4 @@
+
 import connection from "../database/database.js";
 
 async function listCustomers(req, res) {
@@ -19,9 +20,9 @@ async function listCustomers(req, res) {
         res.send(error.message);
     }
 }
+
 async function getCustomer(req, res) {
     const customer_id = req.params.id;
-    console.log(customer_id)
 try {
     const customer = (await connection.query('SELECT * FROM customers WHERE id = $1 ;',[customer_id])).rows[0]
     if(!customer) {
@@ -30,11 +31,25 @@ try {
     res.status(200);
     res.send(customer);
 } catch (error) {
-    return res.sendStatus(500);
+    return res.sendStatus(422);
+}
+}
+
+async function createCustomer(req, res) {
+    const name = req.body.name;
+    const phone = req.body.phone;
+    const cpf = req.body.cpf;
+    const birthday = req.body.birthday;
+try {
+    connection.query('INSERT INTO customers (name, phone, cpf, birthday) VALUES ($1, $2, $3, $4);', [name, phone, cpf, birthday])
+    res.sendStatus(201);
+} catch (error) {
+    res.sendStatus(500);
 }
 }
 
 export {
     listCustomers,
-    getCustomer
+    getCustomer,
+    createCustomer
 }
