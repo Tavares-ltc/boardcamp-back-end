@@ -8,7 +8,6 @@ async function verifyName(req, res, next){
 
     try {
         const alreadyHasName = (await connection.query('SELECT * FROM categories WHERE name = $1;',[name])).rows[0];
-        console.log(alreadyHasName)
     if(alreadyHasName){
         return res.sendStatus(409);
     }
