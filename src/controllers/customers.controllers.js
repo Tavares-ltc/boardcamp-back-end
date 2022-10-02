@@ -2,10 +2,9 @@ import connection from "../database/database.js";
 
 async function listCustomers(req, res) {
   const cpf = req.query.cpf;
-  let offset = 0;
-  if(req.query.offset){
-    offset = req.query.offset
-  }
+  const offset = res.locals.offset;
+  const order = res.locals.offset;
+
   try {
     let customers;
     if (cpf) {
@@ -15,7 +14,7 @@ async function listCustomers(req, res) {
         ])
       ).rows;
     } else {
-      customers = (await connection.query("SELECT * FROM customers OFFSET $1;", [offset])).rows;
+      customers = (await connection.query("SELECT * FROM customers ORDER BY $1 OFFSET $2;", [order, offset])).rows;
     }
     if (!customers) {
       return res.sendStatus(404);
