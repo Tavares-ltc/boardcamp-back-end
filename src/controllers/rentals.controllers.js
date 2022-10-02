@@ -54,7 +54,6 @@ async function createRentalData(req, res) {
   const gameId = req.body.gameId;
   const daysRented = req.body.daysRented;
   const todayDate = dayjs().format("YYYY/MM/DD");
-
   try {
     const gameRentals = (
       await connection.query(
@@ -94,4 +93,45 @@ async function createRentalData(req, res) {
   }
 }
 
-export { listRentals, createRentalData };
+async function returnGame(req, res) {
+  const id = req.params.id;
+  const returnDate = dayjs();
+  const todayDate = dayjs().format("YYYY/MM/DD");
+  let daysPassed = 0;
+  let delayFee = null;
+
+
+try {
+    const rental = (await connection.query(`SELECT * FROM rentals WHERE id = $1;`, [id])).rows[0]
+  if(!rental){
+    return res.sendStatus(400);
+  }
+  if(rental.returnDate){
+    return res.sendStatus(400);
+  }
+
+const rentDate = dayjs(rental.rentDate);
+const date2 = dayjs();
+
+let hours = returnDate.diff(rentDate, 'hours');
+const days = Math.floor(hours / 24);
+hours = hours - (days * 24);
+
+if((days - rental.daysRented) > 0){
+    daysPassed = days - rental.daysRented
+}
+
+const game = (await connection.query(`SELECT * FROM games WHERE id = ${rental.gameId};`)).rows[0]
+const pricePerDay = game.pricePerDay;
+
+delayFee = daysPassed * pricePerDay
+await connection.query(`UPDATE rentals SET "returnDate" = '${todayDate}', "delayFee" = ${delayFee} WHERE id = ${id};`);
+res.sendStatus(200)
+} catch (error) {
+    res.status(500);
+    res.send(error.message);
+} 
+
+
+}
+export { listRentals, createRentalData, returnGame }
