@@ -20,11 +20,6 @@ async function verfifyCustomerData(req, res, next) {
     res.status(400);
     return res.send(errors);
  }
- const hasCPF = (await connection.query('SELECT cpf FROM customers WHERE cpf = $1 ;', [cpf])).rows[0]
-
- if(hasCPF){
-    return res.sendStatus(409)
- }
  
  next()
 
