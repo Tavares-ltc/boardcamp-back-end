@@ -1,10 +1,15 @@
 import connection from "../database/database.js";
 
 async function listGames(req, res) {
+  let offset = 0;
+  if(req.query.offset){
+    offset = req.query.offset;
+  }
+
   try {
     const games = (
       await connection.query(
-        'SELECT games.*, categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id;'
+        'SELECT games.*, categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id OFFSET $1;', [offset]
       )
     ).rows;
     return res.send(games);

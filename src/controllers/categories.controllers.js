@@ -1,8 +1,13 @@
 import connection from "../database/database.js";
 
 async function listCategories(req, res) {
+  let offset = 0;
+  if(req.query.offset){
+    offset = req.query.offset
+  }
+
   try {
-    const categories = (await connection.query("SELECT * FROM categories;"))
+    const categories = (await connection.query("SELECT * FROM categories OFFSET $1 ;", [offset]))
       .rows;
     res.status(200);
     res.send(categories);

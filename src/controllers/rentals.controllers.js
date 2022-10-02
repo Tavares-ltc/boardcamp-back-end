@@ -4,6 +4,10 @@ import dayjs from "dayjs";
 async function listRentals(req, res) {
   const customerId = req.query.customerId;
   const gameId = req.query.gameId;
+  let offset = 0;
+  if(req.query.offset){
+    offset = req.query.offset;
+  }
 
   const rentalsQuery = `SELECT 
             rentals.*,
@@ -26,18 +30,18 @@ async function listRentals(req, res) {
     let rentalsData;
 
     if (!customerId && !gameId) {
-      rentalsData = (await connection.query(rentalsQuery + ";")).rows;
+      rentalsData = (await connection.query(rentalsQuery + "OFFSET $1;", [offset])).rows;
     } else {
       if (customerId) {
         rentalsData = (
-          await connection.query(rentalsQuery + "WHERE customers.id = $1;", [
-            customerId,
+          await connection.query(rentalsQuery + "WHERE customers.id = $1 OFFSET = $2;", [
+            customerId, offset
           ])
         ).rows;
       } else {
         rentalsData = (
-          await connection.query(rentalsQuery + "WHERE games.id = $1;", [
-            gameId,
+          await connection.query(rentalsQuery + "WHERE games.id = $1 OFFSET = $2;", [
+            gameId, offset
           ])
         ).rows;
       }
