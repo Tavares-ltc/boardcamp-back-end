@@ -5,7 +5,7 @@ const offset = res.locals.offset;
 const order = res.locals.order;
 
   try {
-    const categories = (await connection.query(`SELECT id, name FROM categories ORDER BY $1 OFFSET $2;`, [order, offset]))
+    const categories = (await connection.query(`SELECT id, name FROM categories ORDER BY ${order} OFFSET $1;`, [offset]))
       .rows;
     res.status(200);
     res.send(categories);

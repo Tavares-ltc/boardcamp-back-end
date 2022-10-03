@@ -28,12 +28,12 @@ async function listRentals(req, res) {
     let rentalsData;
 
     if (!customerId && !gameId) {
-      rentalsData = (await connection.query(rentalsQuery + "ORDER BY $1 OFFSET $2;", [order, offset])).rows;
+      rentalsData = (await connection.query(rentalsQuery + `ORDER BY ${order} OFFSET $2;`, [offset])).rows;
     } else {
       if (customerId) {
         rentalsData = (
-          await connection.query(rentalsQuery + "WHERE customers.id = $1 ORDER BY $2 OFFSET = $3;", [
-            customerId, order, offset
+          await connection.query(rentalsQuery + `WHERE customers.id = $1 ORDER BY ${order} OFFSET = $2;`, [
+            customerId, offset
           ])
         ).rows;
       } else {
