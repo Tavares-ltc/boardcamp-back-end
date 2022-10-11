@@ -3,13 +3,24 @@ import connection from "../database/database.js";
 async function listGames(req, res) {
   const offset = res.locals.offset;
   const order = res.locals.order;
-
+  const gameName = res.locals.gameName;
   try {
-    const games = (
+    let games;
+    if(gameName){
+      games = (
+        await connection.query(
+          `SELECT games.*, categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id WHERE games.name LIKE $1 ORDER BY ${order} OFFSET $2;`, [gameName+'%',offset]
+        )
+      ).rows;
+    } else {
+        games = (
       await connection.query(
         `SELECT games.*, categories.name AS "categoryName" FROM games JOIN categories ON games."categoryId" = categories.id ORDER BY ${order} OFFSET $1;`, [offset]
       )
     ).rows;
+    }
+
+   
     return res.send(games);
   } catch (error) {
     res.status(500);

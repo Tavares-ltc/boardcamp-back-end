@@ -8,10 +8,15 @@ async function checkQueryParams(req, res, next){
     if(req.query.order){
       order = req.query.order;
     }
+    let gameName = false;
+    if(req.query.name){
+      gameName = req.query.name;
+    }
 
-    res.locals.order = order
-    res.locals.offset = offset
-    next()
+    res.locals.order = order;
+    res.locals.offset = offset;
+    res.locals.gameName = gameName;
+    next();
 }
 
 export default checkQueryParams
