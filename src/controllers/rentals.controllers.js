@@ -28,7 +28,7 @@ async function listRentals(req, res) {
     let rentalsData;
 
     if (!customerId && !gameId) {
-      rentalsData = (await connection.query(rentalsQuery + `ORDER BY ${order} OFFSET $2;`, [offset])).rows;
+      rentalsData = (await connection.query(rentalsQuery + `ORDER BY ${order} OFFSET $1;`, [offset])).rows;
     } else {
       if (customerId) {
         rentalsData = (
@@ -69,10 +69,10 @@ async function createRentalData(req, res) {
         `SELECT "stockTotal", "pricePerDay" FROM games WHERE id = $1;`,
         [gameId]
       )
-    ).rows[0];
-    if (gameRentals.length >= game.stockTotal) {
-      return res.sendStatus(400);
-    }
+      ).rows[0];
+      if (gameRentals.length >= game.stockTotal) {
+        return res.sendStatus(400);
+      }
 
     const originalPrice = game.pricePerDay * daysRented;
     await connection.query(
